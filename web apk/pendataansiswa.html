@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI-DATA SISWA — Sistem Pendataan Sosial, Ekonomi & Hunian Siswa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top left, #eef2ff 0%, #f8fafc 45%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- ==================== NAVBAR GLOBAL ==================== -->
+    <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <!-- Brand Identity -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-lg tracking-tight text-slate-900">SI-DATA <span class="text-indigo-600">SISWA</span></span>
+                        <span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 rounded-md border border-indigo-100">v2.0</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 hidden sm:block">Portal Pendataan Kondisi Ekonomi, Keluarga & Hunian Siswa</p>
+                </div>
+            </div>
+
+            <!-- Status Sesi Pengguna Aktif -->
+            <div id="navbar-session-area" class="flex items-center gap-3">
+                <span class="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200/80">
+                    <i class="fa-solid fa-shield-halved text-indigo-600 mr-1.5"></i>Portal Autentikasi Terpadu
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- =====================================================================
+             VIEW 1: HALAMAN AUTENTIKASI (BUAT AKUN TERLEBIH DAHULU -> LOGIN)
+        ====================================================================== -->
+        <section id="view-auth" class="animate-fade-up max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Kolom Kiri: Panel Informasi & Alur Sistem -->
+                <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-7 sm:p-8 shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-12 -top-12 w-48 h-48 bg-indigo-500/20 rounded-full blur-2xl"></div>
+                    <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-violet-500/20 rounded-full blur-2xl"></div>
+
+                    <div class="relative z-10">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-indigo-200 text-xs font-semibold mb-5">
+                            <i class="fa-solid fa-sparkles text-amber-300"></i> Sistem Kesiswaan Digital
+                        </span>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold leading-tight tracking-tight">
+                            Pendataan Sosial & Ekonomi Siswa Lebih Akurat.
+                        </h1>
+                        <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+                            Silakan <strong>buat akun terlebih dahulu</strong> sesuai peran Anda (Siswa atau Admin Sekolah), kemudian masuk untuk mengakses layanan pendataan maupun pemantauan.
+                        </p>
+
+                        <!-- Langkah Alur -->
+                        <div class="mt-7 space-y-4">
+                            <div class="flex items-start gap-3.5 bg-white/5 border border-white/10 p-3.5 rounded-2xl">
+                                <div class="w-8 h-8 rounded-xl bg-indigo-500/30 text-indigo-200 font-bold text-xs flex items-center justify-center shrink-0 border border-indigo-400/30">01</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">Registrasi Akun Peran</h3>
+                                    <p class="text-xs text-slate-300 mt-0.5">Siswa mendaftar dengan NISN & Tanggal Lahir; Admin mendaftar dengan Email & Kode Otorisasi.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3.5 bg-white/5 border border-white/10 p-3.5 rounded-2xl">
+                                <div class="w-8 h-8 rounded-xl bg-emerald-500/30 text-emerald-200 font-bold text-xs flex items-center justify-center shrink-0 border border-emerald-400/30">02</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">Login Terverifikasi</h3>
+                                    <p class="text-xs text-slate-300 mt-0.5">Metode login berbeda untuk menjaga keamanan data pribadi keluarga & hunian siswa.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3.5 bg-white/5 border border-white/10 p-3.5 rounded-2xl">
+                                <div class="w-8 h-8 rounded-xl bg-amber-500/30 text-amber-200 font-bold text-xs flex items-center justify-center shrink-0 border border-amber-400/30">03</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">Input & Monitoring Real-Time</h3>
+                                    <p class="text-xs text-slate-300 mt-0.5">Siswa mengunggah kondisi ekonomi, alamat & foto rumah; Admin memantau berdasarkan kriteria.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Akun Demo Cepat -->
+                        <div class="mt-7 pt-5 border-t border-white/10">
+                            <p class="text-[11px] uppercase tracking-wider font-bold text-indigo-300 mb-2">Informasi Pengujian Cepat</p>
+                            <div class="text-xs text-slate-300 space-y-1">
+                                <p>• Kode Otorisasi Daftar Admin: <code class="bg-white/15 px-1.5 py-0.5 rounded text-amber-300 font-mono font-bold">SEKOLAH2026</code></p>
+                                <p>• Tersedia tombol <strong>Isi Akun Demo</strong> pada tab Login jika ingin langsung mencoba.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan: Kartu Formulir Registrasi & Login -->
+                <div class="lg:col-span-7 glass-card rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 border border-slate-200/80">
+                    
+                    <!-- Tab Utama: Buat Akun Baru vs Masuk (Login) -->
+                    <div class="grid grid-cols-2 p-1.5 bg-slate-100 rounded-2xl border border-slate-200/70 mb-6">
+                        <button type="button" id="main-tab-register" onclick="switchAuthTab('register')"
+                            class="py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>1. Buat Akun Baru</span>
+                        </button>
+                        <button type="button" id="main-tab-login" onclick="switchAuthTab('login')"
+                            class="py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span>2. Masuk (Login)</span>
+                        </button>
+                    </div>
+
+                    <!-- Pemilih Peran (Siswa vs Admin) -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Pilih Peran Pengguna:</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="role-card-siswa" onclick="switchAuthRole('siswa')"
+                                class="p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/70 text-left transition-all flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm text-slate-900">Peran Siswa</div>
+                                    <div class="text-[11px] text-slate-500">NISN & Biodata</div>
+                                </div>
+                            </button>
+
+                            <button type="button" id="role-card-admin" onclick="switchAuthRole('admin')"
+                                class="p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 text-left transition-all flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-sm text-slate-900">Peran Admin</div>
+                                    <div class="text-[11px] text-slate-500">Email, Sandi & PIN</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ==================== FORM A: REGISTRASI SISWA ==================== -->
+                    <form id="form-register-siswa" onsubmit="handleRegisterSiswa(event)" class="space-y-4 animate-fade-up">
+                        <div class="p-3.5 rounded-xl bg-indigo-50/60 border border-indigo-100 flex items-center gap-2.5 text-xs text-indigo-800">
+                            <i class="fa-solid fa-circle-info text-indigo-600 text-sm"></i>
+                            <span>Buat akun siswa menggunakan <strong>NISN</strong> dan <strong>Tanggal Lahir</strong> untuk mengisi data keluarga & foto rumah.</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Lengkap Siswa <span class="text-rose-500">*</span></label>
+                                <input type="text" id="reg-siswa-nama" required placeholder="Contoh: Raka Aditya Pratama"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">NISN (10 Digit) <span class="text-rose-500">*</span></label>
+                                <input type="text" id="reg-siswa-nisn" required maxlength="10" pattern="[0-9]{10}" placeholder="Contoh: 0081234567"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kelas / Jurusan <span class="text-rose-500">*</span></label>
+                                <select id="reg-siswa-kelas" required
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    <option value="X IPA 1">X IPA 1</option>
+                                    <option value="X IPA 2">X IPA 2</option>
+                                    <option value="X IPS 1">X IPS 1</option>
+                                    <option value="XI IPA 1">XI IPA 1</option>
+                                    <option value="XI IPS 1">XI IPS 1</option>
+                                    <option value="XII IPA 1">XII IPA 1</option>
+                                    <option value="XII IPS 2">XII IPS 2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Tanggal Lahir <span class="text-rose-500">*</span></label>
+                                <input type="date" id="reg-siswa-tgllahir" required
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Buat PIN / Kata Sandi Akun Siswa <span class="text-rose-500">*</span></label>
+                            <input type="password" id="reg-siswa-pin" required minlength="4" placeholder="Minimal 4 karakter (Contoh: 1234 atau rahasia)"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        </div>
+
+                        <button type="submit" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-user-check"></i>
+                            <span>Daftarkan Akun Siswa</span>
+                        </button>
+                    </form>
+
+                    <!-- ==================== FORM B: REGISTRASI ADMIN ==================== -->
+                    <form id="form-register-admin" onsubmit="handleRegisterAdmin(event)" class="hidden space-y-4 animate-fade-up">
+                        <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 flex items-center justify-between gap-2 text-xs text-amber-900">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-key text-amber-600"></i>
+                                <span>Kode Otorisasi Sekolah: <strong class="font-mono bg-white px-1.5 py-0.5 rounded border border-amber-200">SEKOLAH2026</strong></span>
+                            </div>
+                            <button type="button" onclick="document.getElementById('reg-admin-kode').value='SEKOLAH2026'" class="text-[11px] font-bold text-amber-700 underline hover:text-amber-900 shrink-0">
+                                Pakai Kode
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Lengkap & Gelar <span class="text-rose-500">*</span></label>
+                                <input type="text" id="reg-admin-nama" required placeholder="Contoh: Dra. Ratna Sari, M.Pd"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Jabatan di Sekolah <span class="text-rose-500">*</span></label>
+                                <select id="reg-admin-jabatan" required
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                                    <option value="Koordinator BK / Kesiswaan">Koordinator BK / Kesiswaan</option>
+                                    <option value="Wali Kelas">Wali Kelas</option>
+                                    <option value="Staf Tata Usaha (TU)">Staf Tata Usaha (TU)</option>
+                                    <option value="Operator Dapodik Sekolah">Operator Dapodik Sekolah</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Instansi / Username <span class="text-rose-500">*</span></label>
+                                <input type="text" id="reg-admin-email" required placeholder="admin@sekolah.sch.id"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kata Sandi <span class="text-rose-500">*</span></label>
+                                <input type="password" id="reg-admin-password" required minlength="5" placeholder="Minimal 5 karakter"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kode Otorisasi Sekolah <span class="text-rose-500">*</span></label>
+                                <input type="text" id="reg-admin-kode" required placeholder="Masukkan SEKOLAH2026"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Buat PIN Keamanan 6-Digit <span class="text-rose-500">*</span></label>
+                                <input type="text" id="reg-admin-pin" required maxlength="6" pattern="[0-9]{6}" placeholder="Contoh: 112233"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-shield-check"></i>
+                            <span>Daftarkan Akun Admin Sekolah</span>
+                        </button>
+                    </form>
+
+                    <!-- ==================== FORM C: LOGIN SISWA ==================== -->
+                    <form id="form-login-siswa" onsubmit="handleLoginSiswa(event)" class="hidden space-y-4 animate-fade-up">
+                        <div class="flex items-center justify-between bg-indigo-50/70 border border-indigo-100 px-3.5 py-2.5 rounded-xl">
+                            <span class="text-xs text-indigo-900 font-medium"><i class="fa-solid fa-id-badge text-indigo-600 mr-1.5"></i>Autentikasi Akademik Siswa</span>
+                            <button type="button" onclick="fillDemoLoginSiswa()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline">
+                                Isi Akun Demo Siswa
+                            </button>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Nomor Induk Siswa Nasional (NISN) <span class="text-rose-500">*</span></label>
+                            <input type="text" id="login-siswa-nisn" required maxlength="10" placeholder="Masukkan 10 digit NISN terdaftar"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Tanggal Lahir <span class="text-rose-500">*</span></label>
+                                <input type="date" id="login-siswa-tgllahir" required
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">PIN / Kata Sandi Siswa <span class="text-rose-500">*</span></label>
+                                <input type="password" id="login-siswa-pin" required placeholder="Masukkan PIN akun Anda"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
+                            <span>Masuk ke Portal Siswa</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                        <p class="text-center text-xs text-slate-500 pt-1">
+                            Belum punya akun siswa? <button type="button" onclick="switchAuthTab('register')" class="text-indigo-600 font-bold hover:underline">Daftar Akun Baru di sini</button>
+                        </p>
+                    </form>
+
+                    <!-- ==================== FORM D: LOGIN ADMIN ==================== -->
+                    <form id="form-login-admin" onsubmit="handleLoginAdmin(event)" class="hidden space-y-4 animate-fade-up">
+                        <div class="flex items-center justify-between bg-slate-100 border border-slate-200 px-3.5 py-2.5 rounded-xl">
+                            <span class="text-xs text-slate-800 font-medium"><i class="fa-solid fa-lock text-slate-700 mr-1.5"></i>Autentikasi 2-Faktor Staf & Admin</span>
+                            <button type="button" onclick="fillDemoLoginAdmin()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 underline">
+                                Isi Akun Demo Admin
+                            </button>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Email Instansi / Username <span class="text-rose-500">*</span></label>
+                            <input type="text" id="login-admin-email" required placeholder="admin@sekolah.sch.id"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kata Sandi <span class="text-rose-500">*</span></label>
+                                <input type="password" id="login-admin-password" required placeholder="••••••••"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">PIN Keamanan 6-Digit <span class="text-rose-500">*</span></label>
+                                <input type="password" id="login-admin-pin" required maxlength="6" placeholder="6 digit PIN"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-slate-800 bg-white">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                            <span>Masuk ke Dashboard Admin</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                        <p class="text-center text-xs text-slate-500 pt-1">
+                            Belum mendaftarkan akun admin? <button type="button" onclick="switchAuthTab('register')" class="text-indigo-600 font-bold hover:underline">Buat Akun Admin</button>
+                        </p>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             VIEW 2: DASHBOARD SISWA (INPUT DATA KELUARGA, EKONOMI, ALAMAT & FOTO)
+        ====================================================================== -->
+        <section id="view-siswa" class="hidden animate-fade-up space-y-6">
+            
+            <!-- Banner Profil Siswa Aktif -->
+            <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-2xl font-extrabold shrink-0" id="siswa-avatar-initials">
+                        S
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-white/20 text-[11px] font-bold uppercase tracking-wider">Portal Siswa</span>
+                            <span id="siswa-submission-badge" class="px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[11px] font-bold">
+                                Belum Mengisi Data
+                            </span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold mt-1" id="siswa-profile-name">Nama Siswa</h2>
+                        <p class="text-indigo-100 text-xs sm:text-sm mt-0.5" id="siswa-profile-meta">NISN: - • Kelas: -</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 self-start md:self-center">
+                    <button type="button" onclick="fillQuickStudentSurvey()" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-xs font-bold transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Isi Contoh Cepat
+                    </button>
+                    <button type="button" onclick="logoutUser()" class="px-4 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Kolom Kiri (8 Kolom): Formulir Utama -->
+                <form id="student-data-form" onsubmit="handleSaveStudentData(event)" class="lg:col-span-8 space-y-6">
+                    
+                    <!-- Bagian A: Data Keluarga & Orang Tua -->
+                    <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center gap-3 pb-4 mb-5 border-b border-slate-100">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">A</div>
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900">Kondisi Orang Tua & Status Keluarga</h3>
+                                <p class="text-xs text-slate-500">Informasi orang tua kandung atau wali yang menanggung biaya pendidikan.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Status Keluarga <span class="text-rose-500">*</span></label>
+                                <select id="form-status-keluarga" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">-- Pilih Status Keluarga --</option>
+                                    <option value="Lengkap">Lengkap (Ayah & Ibu Ada)</option>
+                                    <option value="Yatim">Yatim (Ayah Meninggal)</option>
+                                    <option value="Piatu">Piatu (Ibu Meninggal)</option>
+                                    <option value="Yatim Piatu">Yatim Piatu</option>
+                                    <option value="Orang Tua Bercerai / Wali">Orang Tua Bercerai / Tinggal dengan Wali</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Jumlah Tanggungan Keluarga (Jiwa) <span class="text-rose-500">*</span></label>
+                                <input type="number" id="form-tanggungan" required min="1" max="20" placeholder="Contoh: 4"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Ayah / Wali <span class="text-rose-500">*</span></label>
+                                <input type="text" id="form-nama-ayah" required placeholder="Nama lengkap ayah atau wali"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Pekerjaan Ayah / Wali <span class="text-rose-500">*</span></label>
+                                <input type="text" id="form-kerja-ayah" required placeholder="Contoh: Buruh Harian / Pedagang / Almarhum"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Nama Ibu <span class="text-rose-500">*</span></label>
+                                <input type="text" id="form-nama-ibu" required placeholder="Nama lengkap ibu"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Pekerjaan Ibu <span class="text-rose-500">*</span></label>
+                                <input type="text" id="form-kerja-ibu" required placeholder="Contoh: Ibu Rumah Tangga / Penjahit"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bagian B: Kondisi Ekonomi -->
+                    <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center gap-3 pb-4 mb-5 border-b border-slate-100">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-sm">B</div>
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900">Kondisi Ekonomi Keluarga</h3>
+                                <p class="text-xs text-slate-500">Digunakan sekolah untuk pemetaan bantuan pendidikan dan beasiswa.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategori Ekonomi <span class="text-rose-500">*</span></label>
+                                <select id="form-ekonomi" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">-- Pilih Kategori --</option>
+                                    <option value="Kurang Mampu / Pra-Sejahtera">Kurang Mampu / Pra-Sejahtera</option>
+                                    <option value="Menengah ke Bawah">Menengah ke Bawah</option>
+                                    <option value="Menengah">Menengah</option>
+                                    <option value="Mampu">Mampu</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Penghasilan Gabungan / Bulan <span class="text-rose-500">*</span></label>
+                                <select id="form-penghasilan" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">-- Pilih Penghasilan --</option>
+                                    <option value="< Rp 1.500.000">&lt; Rp 1.500.000</option>
+                                    <option value="Rp 1.500.000 - Rp 3.000.000">Rp 1.500.000 - Rp 3.000.000</option>
+                                    <option value="Rp 3.000.000 - Rp 6.000.000">Rp 3.000.000 - Rp 6.000.000</option>
+                                    <option value="> Rp 6.000.000">&gt; Rp 6.000.000</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kepemilikan Bantuan Sosial <span class="text-rose-500">*</span></label>
+                                <select id="form-bansos" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="Tidak Ada">Tidak Ada</option>
+                                    <option value="KIP (Kartu Indonesia Pintar)">KIP (Kartu Indonesia Pintar)</option>
+                                    <option value="PKH (Program Keluarga Harapan)">PKH (Program Keluarga Harapan)</option>
+                                    <option value="KKS / BPNT">KKS / BPNT</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bagian C: Alamat Saat Ini & Foto Terbaru Rumah -->
+                    <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center gap-3 pb-4 mb-5 border-b border-slate-100">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">C</div>
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900">Alamat Domisili Saat Ini & Foto Terbaru Rumah</h3>
+                                <p class="text-xs text-slate-500">Masukkan alamat tempat tinggal sekarang dan unggah foto tampak depan rumah terbaru.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Alamat Lengkap Saat Ini (Jalan, No. Rumah, RT/RW, Kel/Desa, Kec, Kota) <span class="text-rose-500">*</span></label>
+                                <textarea id="form-alamat" required rows="2" placeholder="Contoh: Jl. Mertojoyo Blok C No. 18, RT 04/RW 02, Kel. Merjosari, Kec. Lowokwaru, Kota Malang"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Status Kepemilikan Rumah <span class="text-rose-500">*</span></label>
+                                    <select id="form-status-rumah" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <option value="">-- Pilih Status Rumah --</option>
+                                        <option value="Milik Sendiri">Milik Sendiri</option>
+                                        <option value="Sewa / Kontrak">Sewa / Kontrak</option>
+                                        <option value="Menumpang Keluarga / Wali">Menumpang Keluarga / Wali</option>
+                                        <option value="Rumah Dinas">Rumah Dinas</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Deskripsi Fisik Bangunan <span class="text-rose-500">*</span></label>
+                                    <input type="text" id="form-fisik-rumah" required placeholder="Contoh: Dinding tembok, lantai keramik, atap genteng"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+
+                            <!-- Area Upload Foto Rumah (Drag & Drop + Sample Photo Generator) -->
+                            <div>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-bold text-slate-700">Foto Terbaru Tampak Depan Rumah <span class="text-rose-500">*</span></label>
+                                    <button type="button" onclick="useSampleHouseImage()" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                                        <i class="fa-solid fa-image"></i> Gunakan Contoh Foto Rumah Otomatis
+                                    </button>
+                                </div>
+
+                                <div id="dropzone-area" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDropFile(event)"
+                                    class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-2xl p-6 text-center bg-slate-50/70 transition-all cursor-pointer relative"
+                                    onclick="document.getElementById('form-foto-input').click()">
+                                    <input type="file" id="form-foto-input" accept="image/*" class="hidden" onchange="handleHouseFileSelect(event)">
+                                    <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-2.5 text-xl">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    </div>
+                                    <p class="text-sm font-bold text-slate-800">Klik untuk memilih foto atau seret file ke sini</p>
+                                    <p class="text-xs text-slate-500 mt-1">Format JPG, PNG, atau WEBP (Maksimal ukuran file 3 MB)</p>
+                                </div>
+
+                                <!-- Pratinjau Foto Rumah -->
+                                <div id="house-preview-container" class="hidden mt-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
+                                    <div class="flex items-center justify-between mb-2.5">
+                                        <span class="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-circle-check"></i> Foto Rumah Siap Diunggah
+                                        </span>
+                                        <button type="button" onclick="removeHousePhoto()" class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs font-bold transition-colors">
+                                            <i class="fa-solid fa-trash-can mr-1"></i> Hapus / Ganti Foto
+                                        </button>
+                                    </div>
+                                    <div class="rounded-xl overflow-hidden bg-slate-100 border border-slate-200 max-h-72 flex items-center justify-center">
+                                        <img id="house-preview-img" src="" alt="Pratinjau Rumah Siswa" class="w-full h-64 object-cover">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Simpan -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2.5">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Simpan & Kirim Data ke Admin Sekolah</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Kolom Kanan (4 Kolom): Kartu Ringkasan Status Pengajuan Siswa -->
+                <aside class="lg:col-span-4 space-y-5 sticky top-24">
+                    <div class="glass-card rounded-3xl p-6 shadow-sm border border-slate-200/80">
+                        <h3 class="font-bold text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Ringkasan Data Anda
+                        </h3>
+                        <div id="siswa-summary-card-content">
+                            <!-- Diisi via JS -->
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 text-white rounded-3xl p-6 shadow-md">
+                        <h4 class="font-bold text-sm flex items-center gap-2 text-amber-300">
+                            <i class="fa-solid fa-shield-halved"></i> Kerahasiaan Data Terjamin
+                        </h4>
+                        <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                            Seluruh data kondisi ekonomi, status keluarga, alamat domisili, dan foto hunian hanya dapat diakses oleh Admin Kesiswaan / BK sekolah untuk keperluan validasi bantuan siswa.
+                        </p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- =====================================================================
+             VIEW 3: DASHBOARD ADMIN (MONITORING EKONOMI, KELUARGA & ALAMAT)
+        ====================================================================== -->
+        <section id="view-admin" class="hidden animate-fade-up space-y-6">
+            
+            <!-- Header Admin -->
+            <div class="glass-card rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-xl shadow-md shrink-0">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-[11px] font-bold">Dashboard Admin</span>
+                            <span class="text-xs text-slate-500" id="admin-profile-jabatan">Kesiswaan / BK</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5" id="admin-profile-name">Nama Admin</h2>
+                        <p class="text-xs text-slate-500" id="admin-profile-email">admin@sekolah.sch.id</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5 self-start md:self-center">
+                    <button type="button" onclick="logoutUser()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar Admin
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 Kartu Statistik Interaktif -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div onclick="quickFilterAdmin('ALL', 'ALL')" class="glass-card p-5 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Siswa Terdata</span>
+                        <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-2" id="metric-total">0</div>
+                    <p class="text-xs text-slate-500 mt-1">Klik untuk tampilkan semua</p>
+                </div>
+
+                <div onclick="quickFilterAdmin('Kurang Mampu / Pra-Sejahtera', 'ALL')" class="glass-card p-5 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Kurang Mampu</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-amber-600 mt-2" id="metric-kurang-mampu">0</div>
+                    <p class="text-xs text-amber-700/80 mt-1">Prioritas bantuan / KIP</p>
+                </div>
+
+                <div onclick="quickFilterAdmin('ALL', 'YATIM_GROUP')" class="glass-card p-5 rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer group">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Yatim / Piatu / Khusus</span>
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-people-roof"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-rose-600 mt-2" id="metric-keluarga-khusus">0</div>
+                    <p class="text-xs text-slate-500 mt-1">Yatim, Piatu & Wali</p>
+                </div>
+
+                <div class="glass-card p-5 rounded-3xl border border-slate-200/80 shadow-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Foto Rumah Terunggah</span>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i class="fa-solid fa-house-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-emerald-600 mt-2" id="metric-foto-persen">100%</div>
+                    <p class="text-xs text-slate-500 mt-1">Kelengkapan bukti hunian</p>
+                </div>
+            </div>
+
+            <!-- Panel Filter Multi-Kriteria & Pengalih Tampilan (Tabel / Grid Kartu) -->
+            <div class="glass-card p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-end">
+                    <!-- Pencarian Teks -->
+                    <div class="md:col-span-5">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            <i class="fa-solid fa-magnifying-glass text-indigo-500 mr-1"></i> Cari Nama Siswa, NISN, Orang Tua, atau Alamat Rumah
+                        </label>
+                        <input type="text" id="admin-search-input" oninput="renderAdminData()" placeholder="Ketik nama siswa, jalan, kelurahan, atau kecamatan..."
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <!-- Filter Kondisi Ekonomi -->
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            <i class="fa-solid fa-wallet text-amber-500 mr-1"></i> Filter Kondisi Ekonomi
+                        </label>
+                        <select id="admin-filter-ekonomi" onchange="renderAdminData()"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="ALL">Semua Kondisi Ekonomi</option>
+                            <option value="Kurang Mampu / Pra-Sejahtera">Kurang Mampu / Pra-Sejahtera</option>
+                            <option value="Menengah ke Bawah">Menengah ke Bawah</option>
+                            <option value="Menengah">Menengah</option>
+                            <option value="Mampu">Mampu</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Status Keluarga -->
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            <i class="fa-solid fa-users-line text-rose-500 mr-1"></i> Filter Status Keluarga
+                        </label>
+                        <select id="admin-filter-keluarga" onchange="renderAdminData()"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="ALL">Semua Status Keluarga</option>
+                            <option value="YATIM_GROUP">Semua Kondisi Khusus (Yatim/Piatu/Wali)</option>
+                            <option value="Lengkap">Lengkap (Ayah & Ibu Ada)</option>
+                            <option value="Yatim">Yatim</option>
+                            <option value="Piatu">Piatu</option>
+                            <option value="Yatim Piatu">Yatim Piatu</option>
+                            <option value="Orang Tua Bercerai / Wali">Orang Tua Bercerai / Wali</option>
+                        </select>
+                    </div>
+
+                    <!-- Reset Filter -->
+                    <div class="md:col-span-1">
+                        <button type="button" onclick="resetAdminFilters()" title="Reset Semua Filter"
+                            class="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition-colors flex items-center justify-center">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bar Kontrol Tampilan -->
+                <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-xs text-slate-600 font-medium">
+                        Menampilkan <strong id="admin-shown-count" class="text-slate-900">0</strong> data kondisi siswa
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+                        <button type="button" id="btn-layout-table" onclick="switchAdminLayout('table')"
+                            class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-xs transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-table-list"></i> Tabel Lengkap
+                        </button>
+                        <button type="button" id="btn-layout-grid" onclick="switchAdminLayout('grid')"
+                            class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-grip"></i> Kartu Visual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kontainer Tampilan Tabel -->
+            <div id="admin-table-wrapper" class="glass-card rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50/90 border-b border-slate-200 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                                <th class="py-4 px-5">Foto Rumah</th>
+                                <th class="py-4 px-5">Identitas Siswa</th>
+                                <th class="py-4 px-5">Status Keluarga & Orang Tua</th>
+                                <th class="py-4 px-5">Kondisi Ekonomi</th>
+                                <th class="py-4 px-5">Alamat Domisili Saat Ini</th>
+                                <th class="py-4 px-5 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="divide-y divide-slate-100 text-sm">
+                            <!-- Diisi via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Kontainer Tampilan Grid Kartu Visual -->
+            <div id="admin-grid-wrapper" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Diisi via JS -->
+            </div>
+
+            <!-- Empty State jika hasil filter kosong -->
+            <div id="admin-empty-state" class="hidden glass-card rounded-3xl p-12 text-center border border-slate-200/80">
+                <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900">Tidak Ada Data Siswa yang Cocok</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">Coba ubah kata kunci pencarian alamat/nama atau atur ulang filter kondisi ekonomi dan status keluarga.</p>
+                <button type="button" onclick="resetAdminFilters()" class="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">
+                    Reset Filter Pencarian
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ==================== MODAL DETAIL LENGKAP SISWA ==================== -->
+    <div id="student-detail-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-fade-up my-8">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center">
+                        <i class="fa-solid fa-house-user"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base" id="modal-student-name">Nama Siswa</h3>
+                        <p class="text-xs text-slate-400" id="modal-student-sub">NISN • Kelas</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeDetailModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 max-h-[78vh] overflow-y-auto space-y-6">
+                <!-- Foto Terbaru Rumah -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                            <i class="fa-solid fa-camera text-indigo-600 mr-1"></i> Foto Terbaru Kondisi Rumah
+                        </span>
+                        <span id="modal-updated-at" class="text-[11px] text-slate-500">Diperbarui: -</span>
+                    </div>
+                    <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
+                        <img id="modal-house-photo" src="" alt="Foto Rumah" class="w-full h-64 sm:h-80 object-cover">
+                    </div>
+                    <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200/80 text-xs">
+                        <span><strong class="text-slate-800">Status Hunian:</strong> <span id="modal-status-rumah">-</span></span>
+                        <span><strong class="text-slate-800">Fisik:</strong> <span id="modal-fisik-rumah">-</span></span>
+                    </div>
+                </div>
+
+                <!-- Grid Rincian Keluarga & Ekonomi -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-indigo-600 border-b border-slate-200 pb-2">
+                            Kondisi Orang Tua & Keluarga
+                        </h4>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Status Keluarga:</span>
+                            <span id="modal-status-keluarga" class="font-bold text-slate-900">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Ayah / Wali:</span>
+                            <span id="modal-ayah" class="font-semibold text-slate-800 text-right">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Ibu:</span>
+                            <span id="modal-ibu" class="font-semibold text-slate-800 text-right">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Jumlah Tanggungan:</span>
+                            <span id="modal-tanggungan" class="font-semibold text-slate-800">-</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-600 border-b border-slate-200 pb-2">
+                            Ekonomi & Alamat Domisili
+                        </h4>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-500">Kategori Ekonomi:</span>
+                            <span id="modal-ekonomi-badge">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Penghasilan / Bulan:</span>
+                            <span id="modal-penghasilan" class="font-bold text-slate-900">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-slate-500">Bantuan Sosial:</span>
+                            <span id="modal-bansos" class="font-semibold text-slate-800">-</span>
+                        </div>
+                        <div class="pt-1">
+                            <span class="text-[11px] text-slate-500 block mb-1">Alamat Lengkap Saat Ini:</span>
+                            <p id="modal-alamat" class="text-xs font-semibold text-slate-800 bg-white p-2.5 rounded-xl border border-slate-200 leading-relaxed">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <button type="button" id="modal-btn-delete" class="px-4 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-100 transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i> Hapus Data Siswa
+                </button>
+                <button type="button" onclick="closeDetailModal()" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors">
+                    Tutup Detail
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="border-t border-slate-200/80 bg-white/70 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
+            <p>&copy; 2026 <strong>SI-DATA SISWA</strong> — Sistem Informasi Pendataan Ekonomi, Keluarga & Hunian Siswa.</p>
+            <p>Penyimpanan persisten aktif melalui <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono">localStorage</code></p>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        // Kunci Penyimpanan LocalStorage
+        const KEYS = {
+            STUDENT_ACCOUNTS: 'sidata_v2_student_accounts',
+            ADMIN_ACCOUNTS: 'sidata_v2_admin_accounts',
+            STUDENT_RECORDS: 'sidata_v2_student_records',
+            ACTIVE_SESSION: 'sidata_v2_active_session'
+        };
+
+        let currentAuthTab = 'register'; // 'register' | 'login'
+        let currentAuthRole = 'siswa';   // 'siswa' | 'admin'
+        let currentUploadedHouseBase64 = '';
+        let currentAdminLayout = 'table'; // 'table' | 'grid'
+
+        // Generator Gambar Ilustrasi Rumah SVG Crisp (tanpa ketergantungan link eksternal)
+        function generateHouseIllustration(skyColor, wallColor, roofColor, titleText) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+                <rect width="640" height="400" fill="${skyColor}"/>
+                <circle cx="540" cy="70" r="32" fill="#fde047" opacity="0.8"/>
+                <rect y="305" width="640" height="95" fill="#cbd5e1"/>
+                <polygon points="150,185 320,75 490,185" fill="${roofColor}"/>
+                <rect x="185" y="185" width="270" height="125" fill="${wallColor}" stroke="#334155" stroke-width="3"/>
+                <rect x="292" y="230" width="56" height="80" fill="#78350f" rx="4"/>
+                <rect x="215" y="210" width="50" height="48" fill="#bae6fd" stroke="#334155" stroke-width="2.5" rx="4"/>
+                <rect x="375" y="210" width="50" height="48" fill="#bae6fd" stroke="#334155" stroke-width="2.5" rx="4"/>
+                <rect x="150" y="332" width="340" height="38" rx="10" fill="#0f172a" opacity="0.88"/>
+                <text x="320" y="356" font-family="sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">${titleText}</text>
+            </svg>`;
+            return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        }
+
+        // Data Awal (Akun Demo + 3 Data Siswa Realistis)
+        function initializeDefaultStorage() {
+            if (!localStorage.getItem(KEYS.STUDENT_ACCOUNTS)) {
+                const defaultStudentAccounts = [
+                    {
+                        nisn: '0084512901',
+                        nama: 'Ahmad Fauzan Pratama',
+                        kelas: 'XI IPA 1',
+                        tglLahir: '2009-05-14',
+                        pin: '1234'
+                    },
+                    {
+                        nisn: '0089923412',
+                        nama: 'Siti Nurhaliza Putri',
+                        kelas: 'X IPA 2',
+                        tglLahir: '2010-08-21',
+                        pin: '1234'
+                    },
+                    {
+                        nisn: '0076123889',
+                        nama: 'Bima Sakti Nugroho',
+                        kelas: 'XII IPA 1',
+                        tglLahir: '2008-02-10',
+                        pin: '1234'
+                    }
+                ];
+                localStorage.setItem(KEYS.STUDENT_ACCOUNTS, JSON.stringify(defaultStudentAccounts));
+            }
+
+            if (!localStorage.getItem(KEYS.ADMIN_ACCOUNTS)) {
+                const defaultAdminAccounts = [
+                    {
+                        nama: 'Dra. Ratna Sari, M.Pd',
+                        jabatan: 'Koordinator BK / Kesiswaan',
+                        email: 'admin@sekolah.sch.id',
+                        password: 'admin123',
+                        pin: '112233'
+                    }
+                ];
+                localStorage.setItem(KEYS.ADMIN_ACCOUNTS, JSON.stringify(defaultAdminAccounts));
+            }
+
+            if (!localStorage.getItem(KEYS.STUDENT_RECORDS)) {
+                const defaultRecords = [
+                    {
+                        nisn: '0084512901',
+                        nama: 'Ahmad Fauzan Pratama',
+                        kelas: 'XI IPA 1',
+                        statusKeluarga: 'Yatim',
+                        tanggungan: 3,
+                        namaAyah: 'Alm. H. Sulaiman',
+                        kerjaAyah: 'Almarhum (Meninggal 2022)',
+                        namaIbu: 'Siti Aminah',
+                        kerjaIbu: 'Penjahit Rumahan',
+                        ekonomi: 'Kurang Mampu / Pra-Sejahtera',
+                        penghasilan: '< Rp 1.500.000',
+                        bansos: 'KIP (Kartu Indonesia Pintar)',
+                        alamat: 'Jl. Cempaka Gg. III No. 12, RT 04/RW 02, Kel. Tulusrejo, Kec. Lowokwaru, Kota Malang',
+                        statusRumah: 'Menumpang Keluarga / Wali',
+                        fisikRumah: 'Dinding semi permanen (bata & kayu), lantai plester semen',
+                        fotoRumah: generateHouseIllustration('#e0e7ff', '#f8fafc', '#9a3412', 'Hunian Ahmad Fauzan (Semi Permanen)'),
+                        updatedAt: '12 Nov 2026, 08:30'
+                    },
+                    {
+                        nisn: '0089923412',
+                        nama: 'Siti Nurhaliza Putri',
+                        kelas: 'X IPA 2',
+                        statusKeluarga: 'Lengkap',
+                        tanggungan: 5,
+                        namaAyah: 'Bambang Hermawan',
+                        kerjaAyah: 'Buruh Bangunan Harian',
+                        namaIbu: 'Marniati',
+                        kerjaIbu: 'Buruh Cuci / Setrika',
+                        ekonomi: 'Kurang Mampu / Pra-Sejahtera',
+                        penghasilan: '< Rp 1.500.000',
+                        bansos: 'PKH (Program Keluarga Harapan)',
+                        alamat: 'Jl. Muharto Gg. 5B No. 44, RT 08/RW 06, Kel. Kotalama, Kec. Kedungkandang, Kota Malang',
+                        statusRumah: 'Sewa / Kontrak',
+                        fisikRumah: 'Rumah petak kontrakan, dinding batako, lantai keramik lama',
+                        fotoRumah: generateHouseIllustration('#fef3c7', '#f5f5f4', '#7f1d1d', 'Rumah Kontrak Siti Nurhaliza'),
+                        updatedAt: '12 Nov 2026, 09:15'
+                    },
+                    {
+                        nisn: '0076123889',
+                        nama: 'Bima Sakti Nugroho',
+                        kelas: 'XII IPA 1',
+                        statusKeluarga: 'Lengkap',
+                        tanggungan: 4,
+                        namaAyah: 'Agus Nugroho',
+                        kerjaAyah: 'Karyawan Swasta (Admin Logistik)',
+                        namaIbu: 'Wulandari',
+                        kerjaIbu: 'Ibu Rumah Tangga',
+                        ekonomi: 'Menengah',
+                        penghasilan: 'Rp 3.000.000 - Rp 6.000.000',
+                        bansos: 'Tidak Ada',
+                        alamat: 'Perum Griya Shanta Blok G-14, Kel. Mojolangu, Kec. Lowokwaru, Kota Malang',
+                        statusRumah: 'Milik Sendiri',
+                        fisikRumah: 'Rumah permanen tembok cat, lantai keramik 40x40, atap genteng',
+                        fotoRumah: generateHouseIllustration('#dcfce7', '#ffffff', '#1e3a8a', 'Rumah Keluarga Bima Sakti'),
+                        updatedAt: '12 Nov 2026, 10:05'
+                    }
+                ];
+                localStorage.setItem(KEYS.STUDENT_RECORDS, JSON.stringify(defaultRecords));
+            }
+        }
+
+        // Helper Storage Getters & Setters
+        function getData(key) {
+            try {
+                return JSON.parse(localStorage.getItem(key)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+        function setData(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        // ==================== NOTIFIKASI TOAST ====================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let styles = 'bg-slate-900 text-white border-slate-700';
+            let icon = '<i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>';
+
+            if (type === 'error') {
+                styles = 'bg-rose-950 text-white border-rose-800';
+                icon = '<i class="fa-solid fa-circle-exclamation text-rose-400 text-base"></i>';
+            } else if (type === 'info') {
+                styles = 'bg-indigo-950 text-white border-indigo-800';
+                icon = '<i class="fa-solid fa-circle-info text-indigo-300 text-base"></i>';
+            }
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl shadow-xl border text-xs sm:text-sm font-medium animate-fade-up ${styles}`;
+            toast.innerHTML = `${icon}<span class="leading-snug">${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(8px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3800);
+        }
+
+        // ==================== LOGIKA NAVIGASI AUTENTIKASI (REGISTER <-> LOGIN) ====================
+        function switchAuthTab(tab) {
+            currentAuthTab = tab;
+            const btnReg = document.getElementById('main-tab-register');
+            const btnLog = document.getElementById('main-tab-login');
+
+            if (tab === 'register') {
+                btnReg.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm';
+                btnLog.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900';
+            } else {
+                btnLog.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm';
+                btnReg.className = 'py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900';
+            }
+            updateVisibleAuthForm();
+        }
+
+        function switchAuthRole(role) {
+            currentAuthRole = role;
+            const cardSiswa = document.getElementById('role-card-siswa');
+            const cardAdmin = document.getElementById('role-card-admin');
+
+            if (role === 'siswa') {
+                cardSiswa.className = 'p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/70 text-left transition-all flex items-center gap-3';
+                cardAdmin.className = 'p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 text-left transition-all flex items-center gap-3';
+            } else {
+                cardAdmin.className = 'p-3.5 rounded-2xl border-2 border-slate-900 bg-slate-100/80 text-left transition-all flex items-center gap-3';
+                cardSiswa.className = 'p-3.5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-300 text-left transition-all flex items-center gap-3';
+            }
+            updateVisibleAuthForm();
+        }
+
+        function updateVisibleAuthForm() {
+            const forms = ['form-register-siswa', 'form-register-admin', 'form-login-siswa', 'form-login-admin'];
+            forms.forEach(id => document.getElementById(id).classList.add('hidden'));
+
+            const activeFormId = `form-${currentAuthTab}-${currentAuthRole}`;
+            document.getElementById(activeFormId).classList.remove('hidden');
+        }
+
+        // ==================== PROSES REGISTRASI & LOGIN SISWA ====================
+        function handleRegisterSiswa(e) {
+            e.preventDefault();
+            const nama = document.getElementById('reg-siswa-nama').value.trim();
+            const nisn = document.getElementById('reg-siswa-nisn').value.trim();
+            const kelas = document.getElementById('reg-siswa-kelas').value;
+            const tglLahir = document.getElementById('reg-siswa-tgllahir').value;
+            const pin = document.getElementById('reg-siswa-pin').value.trim();
+
+            if (!/^\d{10}$/.test(nisn)) {
+                showToast('NISN harus terdiri dari tepat 10 digit angka.', 'error');
+                return;
+            }
+
+            const accounts = getData(KEYS.STUDENT_ACCOUNTS);
+            if (accounts.some(acc => acc.nisn === nisn)) {
+                showToast('NISN tersebut sudah terdaftar! Silakan langsung masuk pada tab Login.', 'error');
+                switchAuthTab('login');
+                document.getElementById('login-siswa-nisn').value = nisn;
+                return;
+            }
+
+            accounts.push({ nisn, nama, kelas, tglLahir, pin });
+            setData(KEYS.STUDENT_ACCOUNTS, accounts);
+
+            // Reset & arahkan otomatis ke Tab Login Siswa dengan isian terisi
+            document.getElementById('form-register-siswa').reset();
+            switchAuthTab('login');
+            switchAuthRole('siswa');
+            document.getElementById('login-siswa-nisn').value = nisn;
+            document.getElementById('login-siswa-tgllahir').value = tglLahir;
+            document.getElementById('login-siswa-pin').value = pin;
+
+            showToast(`Akun siswa atas nama ${nama} berhasil dibuat! Silakan klik Masuk.`);
+        }
+
+        function handleLoginSiswa(e) {
+            e.preventDefault();
+            const nisn = document.getElementById('login-siswa-nisn').value.trim();
+            const tglLahir = document.getElementById('login-siswa-tgllahir').value;
+            const pin = document.getElementById('login-siswa-pin').value.trim();
+
+            const accounts = getData(KEYS.STUDENT_ACCOUNTS);
+            const matched = accounts.find(acc => acc.nisn === nisn && acc.tglLahir === tglLahir && acc.pin === pin);
+
+            if (!matched) {
+                showToast('Login gagal! Periksa kembali NISN, Tanggal Lahir, dan PIN akun Anda.', 'error');
+                return;
+            }
+
+            const session = { role: 'siswa', user: matched };
+            localStorage.setItem(KEYS.ACTIVE_SESSION, JSON.stringify(session));
+            showToast(`Selamat datang, ${matched.nama}!`);
+            renderAppFromSession();
+        }
+
+        function fillDemoLoginSiswa() {
+            const accounts = getData(KEYS.STUDENT_ACCOUNTS);
+            const demo = accounts[0];
+            if (demo) {
+                document.getElementById('login-siswa-nisn').value = demo.nisn;
+                document.getElementById('login-siswa-tgllahir').value = demo.tglLahir;
+                document.getElementById('login-siswa-pin').value = demo.pin;
+                showToast('Kredensial demo siswa diisi. Klik "Masuk ke Portal Siswa".', 'info');
+            }
+        }
+
+        // ==================== PROSES REGISTRASI & LOGIN ADMIN ====================
+        function handleRegisterAdmin(e) {
+            e.preventDefault();
+            const nama = document.getElementById('reg-admin-nama').value.trim();
+            const jabatan = document.getElementById('reg-admin-jabatan').value;
+            const email = document.getElementById('reg-admin-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-admin-password').value;
+            const kode = document.getElementById('reg-admin-kode').value.trim().toUpperCase();
+            const pin = document.getElementById('reg-admin-pin').value.trim();
+
+            if (kode !== 'SEKOLAH2026') {
+                showToast('Kode Otorisasi Sekolah salah! Gunakan kode: SEKOLAH2026', 'error');
+                return;
+            }
+            if (!/^\d{6}$/.test(pin)) {
+                showToast('PIN Keamanan Admin harus tepat 6 digit angka.', 'error');
+                return;
+            }
+
+            const admins = getData(KEYS.ADMIN_ACCOUNTS);
+            if (admins.some(a => a.email === email)) {
+                showToast('Email / Username Admin sudah terdaftar! Silakan masuk.', 'error');
+                switchAuthTab('login');
+                document.getElementById('login-admin-email').value = email;
+                return;
+            }
+
+            admins.push({ nama, jabatan, email, password, pin });
+            setData(KEYS.ADMIN_ACCOUNTS, admins);
+
+            document.getElementById('form-register-admin').reset();
+            switchAuthTab('login');
+            switchAuthRole('admin');
+            document.getElementById('login-admin-email').value = email;
+            document.getElementById('login-admin-password').value = password;
+            document.getElementById('login-admin-pin').value = pin;
+
+            showToast(`Akun Admin (${nama}) berhasil dibuat! Silakan klik Masuk.`);
+        }
+
+        function handleLoginAdmin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-admin-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-admin-password').value;
+            const pin = document.getElementById('login-admin-pin').value.trim();
+
+            const admins = getData(KEYS.ADMIN_ACCOUNTS);
+            const matched = admins.find(a => a.email === email && a.password === password && a.pin === pin);
+
+            if (!matched) {
+                showToast('Autentikasi Admin ditolak! Pastikan Email, Kata Sandi, dan PIN 6-Digit benar.', 'error');
+                return;
+            }
+
+            const session = { role: 'admin', user: matched };
+            localStorage.setItem(KEYS.ACTIVE_SESSION, JSON.stringify(session));
+            showToast(`Login Admin berhasil. Selamat bertugas, ${matched.nama}!`);
+            renderAppFromSession();
+        }
+
+        function fillDemoLoginAdmin() {
+            const admins = getData(KEYS.ADMIN_ACCOUNTS);
+            const demo = admins[0];
+            if (demo) {
+                document.getElementById('login-admin-email').value = demo.email;
+                document.getElementById('login-admin-password').value = demo.password;
+                document.getElementById('login-admin-pin').value = demo.pin;
+                showToast('Kredensial demo admin diisi. Klik "Masuk ke Dashboard Admin".', 'info');
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(KEYS.ACTIVE_SESSION);
+            currentUploadedHouseBase64 = '';
+            showToast('Anda telah keluar dari sistem.', 'info');
+            renderAppFromSession();
+        }
+
+        // ==================== RENDER VIEW BERDASARKAN SESI AKTIF ====================
+        function renderAppFromSession() {
+            const rawSession = localStorage.getItem(KEYS.ACTIVE_SESSION);
+            const viewAuth = document.getElementById('view-auth');
+            const viewSiswa = document.getElementById('view-siswa');
+            const viewAdmin = document.getElementById('view-admin');
+            const navSession = document.getElementById('navbar-session-area');
+
+            viewAuth.classList.add('hidden');
+            viewSiswa.classList.add('hidden');
+            viewAdmin.classList.add('hidden');
+
+            if (!rawSession) {
+                viewAuth.classList.remove('hidden');
+                navSession.innerHTML = `
+                    <span class="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200/80">
+                        <i class="fa-solid fa-shield-halved text-indigo-600 mr-1.5"></i>Portal Autentikasi Terpadu
+                    </span>
+                `;
+                return;
+            }
+
+            const session = JSON.parse(rawSession);
+
+            if (session.role === 'siswa') {
+                viewSiswa.classList.remove('hidden');
+                navSession.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                            <i class="fa-solid fa-user-graduate"></i> ${session.user.nama}
+                        </span>
+                        <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 text-xs font-bold transition-colors">
+                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                        </button>
+                    </div>
+                `;
+                initStudentDashboard(session.user);
+            } else if (session.role === 'admin') {
+                viewAdmin.classList.remove('hidden');
+                navSession.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-bold">
+                            <i class="fa-solid fa-user-shield text-amber-400"></i> ${session.user.nama}
+                        </span>
+                        <button onclick="logoutUser()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 text-xs font-bold transition-colors">
+                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                        </button>
+                    </div>
+                `;
+                initAdminDashboard(session.user);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==================== LOGIKA DASHBOARD SISWA ====================
+        function initStudentDashboard(studentUser) {
+            document.getElementById('siswa-profile-name').textContent = studentUser.nama;
+            document.getElementById('siswa-profile-meta').textContent = `NISN: ${studentUser.nisn} • Kelas: ${studentUser.kelas} • Tgl Lahir: ${studentUser.tglLahir}`;
+            document.getElementById('siswa-avatar-initials').textContent = studentUser.nama.charAt(0).toUpperCase();
+
+            const records = getData(KEYS.STUDENT_RECORDS);
+            const existingRecord = records.find(r => r.nisn === studentUser.nisn);
+
+            const badge = document.getElementById('siswa-submission-badge');
+            const formEl = document.getElementById('student-data-form');
+
+            if (existingRecord) {
+                badge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[11px] font-extrabold';
+                badge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> Data Sudah Terkirim';
+
+                document.getElementById('form-status-keluarga').value = existingRecord.statusKeluarga || '';
+                document.getElementById('form-tanggungan').value = existingRecord.tanggungan || '';
+                document.getElementById('form-nama-ayah').value = existingRecord.namaAyah || '';
+                document.getElementById('form-kerja-ayah').value = existingRecord.kerjaAyah || '';
+                document.getElementById('form-nama-ibu').value = existingRecord.namaIbu || '';
+                document.getElementById('form-kerja-ibu').value = existingRecord.kerjaIbu || '';
+                document.getElementById('form-ekonomi').value = existingRecord.ekonomi || '';
+                document.getElementById('form-penghasilan').value = existingRecord.penghasilan || '';
+                document.getElementById('form-bansos').value = existingRecord.bansos || 'Tidak Ada';
+                document.getElementById('form-alamat').value = existingRecord.alamat || '';
+                document.getElementById('form-status-rumah').value = existingRecord.statusRumah || '';
+                document.getElementById('form-fisik-rumah').value = existingRecord.fisikRumah || '';
+
+                if (existingRecord.fotoRumah) {
+                    currentUploadedHouseBase64 = existingRecord.fotoRumah;
+                    document.getElementById('house-preview-img').src = existingRecord.fotoRumah;
+                    document.getElementById('house-preview-container').classList.remove('hidden');
+                }
+            } else {
+                badge.className = 'px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold';
+                badge.innerHTML = '<i class="fa-solid fa-clock mr-1"></i> Belum Mengisi Data';
+                formEl.reset();
+                removeHousePhoto();
+            }
+
+            renderStudentSummaryCard(existingRecord);
+        }
+
+        function renderStudentSummaryCard(record) {
+            const container = document.getElementById('siswa-summary-card-content');
+            if (!record) {
+                container.innerHTML = `
+                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200/80 text-center">
+                        <i class="fa-solid fa-file-pen text-amber-500 text-2xl mb-2"></i>
+                        <p class="text-xs font-bold text-amber-900">Formulir Belum Dikirim</p>
+                        <p class="text-[11px] text-amber-800/80 mt-1">Silakan lengkapi kondisi orang tua, ekonomi, alamat saat ini, serta unggah foto terbaru rumah Anda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="rounded-2xl overflow-hidden border border-slate-200 h-36 bg-slate-100">
+                        <img src="${record.fotoRumah}" alt="Rumah" class="w-full h-full object-cover">
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Status Keluarga:</span>
+                            <span class="font-bold text-slate-900">${record.statusKeluarga}</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Kondisi Ekonomi:</span>
+                            <span class="font-bold text-indigo-600">${record.ekonomi}</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-100">
+                            <span class="text-slate-500">Penghasilan:</span>
+                            <span class="font-semibold text-slate-800">${record.penghasilan}</span>
+                        </div>
+                        <div class="pt-1">
+                            <span class="text-slate-500 block mb-0.5">Alamat Terdaftar:</span>
+                            <p class="font-medium text-slate-800 bg-slate-50 p-2 rounded-xl border border-slate-200/70">${record.alamat}</p>
+                        </div>
+                        <p class="text-[11px] text-emerald-700 font-semibold pt-1">
+                            <i class="fa-solid fa-check-double mr-1"></i> Terakhir diperbarui: ${record.updatedAt}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Upload & Drag-Drop Foto Rumah
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('dropzone-area').classList.add('border-indigo-600', 'bg-indigo-50/60');
+        }
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('dropzone-area').classList.remove('border-indigo-600', 'bg-indigo-50/60');
+        }
+        function handleDropFile(e) {
+            e.preventDefault();
+            document.getElementById('dropzone-area').classList.remove('border-indigo-600', 'bg-indigo-50/60');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                processHouseImageFile(e.dataTransfer.files[0]);
+            }
+        }
+        function handleHouseFileSelect(e) {
+            if (e.target.files && e.target.files[0]) {
+                processHouseImageFile(e.target.files[0]);
+            }
+        }
+        function processHouseImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('File harus berupa gambar (JPG, PNG, WEBP).', 'error');
+                return;
+            }
+            if (file.size > 3 * 1024 * 1024) {
+                showToast('Ukuran foto maksimal 3 MB agar tersimpan optimal.', 'error');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                currentUploadedHouseBase64 = evt.target.result;
+                document.getElementById('house-preview-img').src = currentUploadedHouseBase64;
+                document.getElementById('house-preview-container').classList.remove('hidden');
+                showToast('Foto rumah berhasil dimuat!');
+            };
+            reader.readAsDataURL(file);
+        }
+        function removeHousePhoto() {
+            currentUploadedHouseBase64 = '';
+            document.getElementById('form-foto-input').value = '';
+            document.getElementById('house-preview-container').classList.add('hidden');
+            document.getElementById('house-preview-img').src = '';
+        }
+        function useSampleHouseImage() {
+            const session = JSON.parse(localStorage.getItem(KEYS.ACTIVE_SESSION));
+            const nama = session ? session.user.nama : 'Siswa';
+            currentUploadedHouseBase64 = generateHouseIllustration('#dbeafe', '#ffffff', '#4338ca', `Foto Hunian ${nama}`);
+            document.getElementById('house-preview-img').src = currentUploadedHouseBase64;
+            document.getElementById('house-preview-container').classList.remove('hidden');
+            showToast('Contoh foto rumah otomatis dipasang!', 'info');
+        }
+
+        function fillQuickStudentSurvey() {
+            document.getElementById('form-status-keluarga').value = 'Yatim';
+            document.getElementById('form-tanggungan').value = '4';
+            document.getElementById('form-nama-ayah').value = 'Alm. Hendra Wijaya';
+            document.getElementById('form-kerja-ayah').value = 'Almarhum';
+            document.getElementById('form-nama-ibu').value = 'Ratih Kumalasari';
+            document.getElementById('form-kerja-ibu').value = 'Pedagang Kue Rumahan';
+            document.getElementById('form-ekonomi').value = 'Kurang Mampu / Pra-Sejahtera';
+            document.getElementById('form-penghasilan').value = '< Rp 1.500.000';
+            document.getElementById('form-bansos').value = 'KIP (Kartu Indonesia Pintar)';
+            document.getElementById('form-alamat').value = 'Jl. Soekarno Hatta Gg. Melati No. 27, RT 03/RW 05, Kel. Jatimulyo, Kec. Lowokwaru, Kota Malang';
+            document.getElementById('form-status-rumah').value = 'Sewa / Kontrak';
+            document.getElementById('form-fisik-rumah').value = 'Rumah kontrakan petak, dinding tembok, lantai keramik';
+            useSampleHouseImage();
+        }
+
+        function handleSaveStudentData(e) {
+            e.preventDefault();
+            if (!currentUploadedHouseBase64) {
+                showToast('Harap unggah foto terbaru rumah Anda terlebih dahulu!', 'error');
+                return;
+            }
+
+            const session = JSON.parse(localStorage.getItem(KEYS.ACTIVE_SESSION));
+            if (!session || session.role !== 'siswa') return;
+
+            const now = new Date();
+            const timestamp = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
+                              now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            const newRecord = {
+                nisn: session.user.nisn,
+                nama: session.user.nama,
+                kelas: session.user.kelas,
+                statusKeluarga: document.getElementById('form-status-keluarga').value,
+                tanggungan: parseInt(document.getElementById('form-tanggungan').value, 10) || 1,
+                namaAyah: document.getElementById('form-nama-ayah').value.trim(),
+                kerjaAyah: document.getElementById('form-kerja-ayah').value.trim(),
+                namaIbu: document.getElementById('form-nama-ibu').value.trim(),
+                kerjaIbu: document.getElementById('form-kerja-ibu').value.trim(),
+                ekonomi: document.getElementById('form-ekonomi').value,
+                penghasilan: document.getElementById('form-penghasilan').value,
+                bansos: document.getElementById('form-bansos').value,
+                alamat: document.getElementById('form-alamat').value.trim(),
+                statusRumah: document.getElementById('form-status-rumah').value,
+                fisikRumah: document.getElementById('form-fisik-rumah').value.trim(),
+                fotoRumah: currentUploadedHouseBase64,
+                updatedAt: timestamp
+            };
+
+            const records = getData(KEYS.STUDENT_RECORDS);
+            const idx = records.findIndex(r => r.nisn === session.user.nisn);
+            if (idx >= 0) {
+                records[idx] = newRecord;
+            } else {
+                records.unshift(newRecord);
+            }
+            setData(KEYS.STUDENT_RECORDS, records);
+
+            showToast('Data kondisi keluarga, ekonomi, alamat & foto rumah berhasil disimpan!');
+            initStudentDashboard(session.user);
+        }
+
+        // ==================== LOGIKA DASHBOARD ADMIN ====================
+        function initAdminDashboard(adminUser) {
+            document.getElementById('admin-profile-name').textContent = adminUser.nama;
+            document.getElementById('admin-profile-jabatan').textContent = adminUser.jabatan;
+            document.getElementById('admin-profile-email').textContent = adminUser.email;
+
+            updateAdminMetrics();
+            renderAdminData();
+        }
+
+        function updateAdminMetrics() {
+            const records = getData(KEYS.STUDENT_RECORDS);
+            const total = records.length;
+            const kurangMampu = records.filter(r => r.ekonomi === 'Kurang Mampu / Pra-Sejahtera').length;
+            const keluargaKhusus = records.filter(r => r.statusKeluarga !== 'Lengkap').length;
+            const withPhoto = records.filter(r => Boolean(r.fotoRumah)).length;
+            const photoPct = total === 0 ? 0 : Math.round((withPhoto / total) * 100);
+
+            document.getElementById('metric-total').textContent = total;
+            document.getElementById('metric-kurang-mampu').textContent = kurangMampu;
+            document.getElementById('metric-keluarga-khusus').textContent = keluargaKhusus;
+            document.getElementById('metric-foto-persen').textContent = `${photoPct}%`;
+        }
+
+        function quickFilterAdmin(ekonomiVal, keluargaVal) {
+            document.getElementById('admin-filter-ekonomi').value = ekonomiVal;
+            document.getElementById('admin-filter-keluarga').value = keluargaVal;
+            renderAdminData();
+        }
+
+        function resetAdminFilters() {
+            document.getElementById('admin-search-input').value = '';
+            document.getElementById('admin-filter-ekonomi').value = 'ALL';
+            document.getElementById('admin-filter-keluarga').value = 'ALL';
+            renderAdminData();
+        }
+
+        function switchAdminLayout(layout) {
+            currentAdminLayout = layout;
+            const btnTable = document.getElementById('btn-layout-table');
+            const btnGrid = document.getElementById('btn-layout-grid');
+
+            if (layout === 'table') {
+                btnTable.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-xs transition-all flex items-center gap-1.5';
+                btnGrid.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
+            } else {
+                btnGrid.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-600 shadow-xs transition-all flex items-center gap-1.5';
+                btnTable.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
+            }
+            renderAdminData();
+        }
+
+        function getEconomyBadge(ekonomi) {
+            if (ekonomi === 'Kurang Mampu / Pra-Sejahtera') {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Kurang Mampu</span>`;
+            }
+            if (ekonomi === 'Menengah ke Bawah') {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-orange-100 text-orange-800 border border-orange-200"><span class="w-1.5 h-1.5 rounded-full bg-orange-600"></span>Menengah Bawah</span>`;
+            }
+            if (ekonomi === 'Menengah') {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200"><span class="w-1.5 h-1.5 rounded-full bg-indigo-600"></span>Menengah</span>`;
+            }
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Mampu</span>`;
+        }
+
+        function getFamilyBadge(status) {
+            if (status === 'Lengkap') {
+                return `<span class="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">${status}</span>`;
+            }
+            return `<span class="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-700 border border-rose-200">${status}</span>`;
+        }
+
+        function renderAdminData() {
+            const records = getData(KEYS.STUDENT_RECORDS);
+            const q = document.getElementById('admin-search-input').value.toLowerCase().trim();
+            const fEkonomi = document.getElementById('admin-filter-ekonomi').value;
+            const fKeluarga = document.getElementById('admin-filter-keluarga').value;
+
+            const filtered = records.filter(item => {
+                const matchText = !q ||
+                    item.nama.toLowerCase().includes(q) ||
+                    item.nisn.toLowerCase().includes(q) ||
+                    item.alamat.toLowerCase().includes(q) ||
+                    (item.namaAyah && item.namaAyah.toLowerCase().includes(q)) ||
+                    (item.namaIbu && item.namaIbu.toLowerCase().includes(q));
+
+                const matchEkonomi = fEkonomi === 'ALL' || item.ekonomi === fEkonomi;
+                const matchKeluarga = fKeluarga === 'ALL' ||
+                    (fKeluarga === 'YATIM_GROUP' ? item.statusKeluarga !== 'Lengkap' : item.statusKeluarga === fKeluarga);
+
+                return matchText && matchEkonomi && matchKeluarga;
+            });
+
+            document.getElementById('admin-shown-count').textContent = filtered.length;
+
+            const tableWrapper = document.getElementById('admin-table-wrapper');
+            const gridWrapper = document.getElementById('admin-grid-wrapper');
+            const emptyState = document.getElementById('admin-empty-state');
+
+            if (filtered.length === 0) {
+                tableWrapper.classList.add('hidden');
+                gridWrapper.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            if (currentAdminLayout === 'table') {
+                tableWrapper.classList.remove('hidden');
+                gridWrapper.classList.add('hidden');
+
+                const tbody = document.getElementById('admin-table-body');
+                tbody.innerHTML = filtered.map(item => `
+                    <tr class="hover:bg-indigo-50/40 transition-colors cursor-pointer group" onclick="openDetailModal('${item.nisn}')">
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            <div class="w-16 h-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-2xs">
+                                <img src="${item.fotoRumah}" alt="Rumah ${item.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                            </div>
+                        </td>
+                        <td class="py-4 px-5">
+                            <div class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">${item.nama}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">NISN: <span class="font-mono">${item.nisn}</span> • <strong>${item.kelas}</strong></div>
+                        </td>
+                        <td class="py-4 px-5">
+                            <div>${getFamilyBadge(item.statusKeluarga)}</div>
+                            <div class="text-[11px] text-slate-500 mt-1 truncate max-w-[180px]">Ayah: ${item.kerjaAyah}</div>
+                        </td>
+                        <td class="py-4 px-5 whitespace-nowrap">
+                            <div>${getEconomyBadge(item.ekonomi)}</div>
+                            <div class="text-[11px] text-slate-500 mt-1">${item.penghasilan}</div>
+                        </td>
+                        <td class="py-4 px-5">
+                            <p class="text-xs text-slate-700 line-clamp-2 max-w-xs">
+                                <i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${item.alamat}
+                            </p>
+                        </td>
+                        <td class="py-4 px-5 text-right whitespace-nowrap" onclick="event.stopPropagation()">
+                            <button onclick="openDetailModal('${item.nisn}')" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white text-xs font-bold transition-colors">
+                                Lihat Detail
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tableWrapper.classList.add('hidden');
+                gridWrapper.classList.remove('hidden');
+
+                gridWrapper.innerHTML = filtered.map(item => `
+                    <div class="glass-card rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group cursor-pointer" onclick="openDetailModal('${item.nisn}')">
+                        <div>
+                            <div class="h-44 bg-slate-100 relative overflow-hidden">
+                                <img src="${item.fotoRumah}" alt="Rumah ${item.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                    ${getEconomyBadge(item.ekonomi)}
+                                </div>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div>
+                                        <h4 class="font-bold text-base text-slate-900 group-hover:text-indigo-600 transition-colors">${item.nama}</h4>
+                                        <p class="text-xs text-slate-500">NISN: ${item.nisn} • ${item.kelas}</p>
+                                    </div>
+                                    ${getFamilyBadge(item.statusKeluarga)}
+                                </div>
+                                <p class="text-xs text-slate-600 mt-3 line-clamp-2 leading-relaxed">
+                                    <i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${item.alamat}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="px-5 py-3 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">${item.penghasilan}</span>
+                            <span class="font-bold text-indigo-600 group-hover:translate-x-0.5 transition-transform">Lihat Detail &rarr;</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==================== MODAL DETAIL LENGKAP ====================
+        function openDetailModal(nisn) {
+            const records = getData(KEYS.STUDENT_RECORDS);
+            const item = records.find(r => r.nisn === nisn);
+            if (!item) return;
+
+            document.getElementById('modal-student-name').textContent = item.nama;
+            document.getElementById('modal-student-sub').textContent = `NISN: ${item.nisn} • Kelas ${item.kelas}`;
+            document.getElementById('modal-updated-at').textContent = `Diperbarui: ${item.updatedAt || '-'}`;
+            document.getElementById('modal-house-photo').src = item.fotoRumah;
+            document.getElementById('modal-status-rumah').textContent = item.statusRumah || '-';
+            document.getElementById('modal-fisik-rumah').textContent = item.fisikRumah || '-';
+
+            document.getElementById('modal-status-keluarga').innerHTML = getFamilyBadge(item.statusKeluarga);
+            document.getElementById('modal-ayah').textContent = `${item.namaAyah || '-'} (${item.kerjaAyah || '-'})`;
+            document.getElementById('modal-ibu').textContent = `${item.namaIbu || '-'} (${item.kerjaIbu || '-'})`;
+            document.getElementById('modal-tanggungan').textContent = `${item.tanggungan} Jiwa`;
+
+            document.getElementById('modal-ekonomi-badge').innerHTML = getEconomyBadge(item.ekonomi);
+            document.getElementById('modal-penghasilan').textContent = item.penghasilan;
+            document.getElementById('modal-bansos').textContent = item.bansos || 'Tidak Ada';
+            document.getElementById('modal-alamat').textContent = item.alamat;
+
+            document.getElementById('modal-btn-delete').onclick = function() {
+                deleteStudentData(item.nisn);
+            };
+
+            document.getElementById('student-detail-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('student-detail-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function deleteStudentData(nisn) {
+            const records = getData(KEYS.STUDENT_RECORDS);
+            const updated = records.filter(r => r.nisn !== nisn);
+            setData(KEYS.STUDENT_RECORDS, updated);
+            closeDetailModal();
+            updateAdminMetrics();
+            renderAdminData();
+            showToast('Data siswa berhasil dihapus dari daftar.', 'info');
+        }
+
+        document.getElementById('student-detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetailModal();
+        });
+
+        // Inisialisasi Aplikasi
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeDefaultStorage();
+            switchAuthTab('register'); // Default buka tab Buat Akun Baru terlebih dahulu
+            switchAuthRole('siswa');
+            renderAppFromSession();
+        });
+    </script>
+</body>
+</html>
